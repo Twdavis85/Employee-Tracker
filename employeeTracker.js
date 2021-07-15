@@ -16,3 +16,11 @@ DB.getRole().then(role => {
 DB.addRole("Receptionist", 50000, 4).then(res => {
     console.log(res)
 });
+
+DB.getEmployee().then(employee => {
+    console.log(employee)
+});
+
+DB.addEmployee("Tiffany", "Smith", 2, 1).then(res => {
+    console.log(res)
+});

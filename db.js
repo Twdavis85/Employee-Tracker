@@ -22,6 +22,17 @@ class DB {
       dept_id: deptId,
     });
   }
+  getEmployee() {
+      return this.connection.query("SELECT * FROM employee");
+  }
+  addEmployee(firstName, lastName, roleId, manId) {
+      return this.connection.query("INSERT INTO employee SET ?", {
+         first_name: firstName,
+         last_name: lastName,
+         role_id: roleId,
+         man_id: manId, 
+      });
+  }
 }
 
 module.exports = new DB(connection);
