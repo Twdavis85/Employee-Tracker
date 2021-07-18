@@ -63,28 +63,72 @@ function employeePrompt() {
     });
 }
 
+function rolePrompt() {
+  inquirer
+    .prompt({
+      type: "list",
+      name: "roleMenu",
+      message: "What would you like to do?",
+      choices: ["View All Positions", "Add New Position", "Exit"],
+    })
+    .then(function (answer) {
+      switch (answer.emplMenu) {
+        case "View All Positions":
+          allRoles();
+          break;
+        case "Add New Position":
+          newRole();
+          break;
+        default:
+          theEnd();
+      }
+    });
+}
+
+function deptPrompt() {
+  inquirer
+    .prompt({
+      type: "list",
+      name: "deptMenu",
+      message: "What would you like to do?",
+      choices: ["View All Departments", "Add New Department", "Exit"],
+    })
+    .then(function (answer) {
+      switch (answer.emplMenu) {
+        case "View All Departments":
+          allDepts();
+          break;
+        case "Add New Department":
+          newDept();
+          break;
+        default:
+          theEnd();
+      }
+    });
+}
+
 DB.getDepts().then((dept) => {
-//   console.log(dept);
+  //   console.log(dept);
 });
 
 DB.addDept("social media").then((res) => {
-//   console.log(res);
+  //   console.log(res);
 });
 
 DB.getRole().then((role) => {
-//   console.log(role);
+  //   console.log(role);
 });
 
 DB.addRole("Receptionist", 50000, 4).then((res) => {
-//   console.log(res);
+  //   console.log(res);
 });
 
 DB.getEmployee().then((employee) => {
-//   console.log(employee);
+  //   console.log(employee);
 });
 
 DB.addEmployee("Tiffany", "Smith", 2, 1).then((res) => {
-//   console.log(res);
+  //   console.log(res);
 });
 
 startProg();
