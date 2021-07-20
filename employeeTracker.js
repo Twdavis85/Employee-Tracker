@@ -4,7 +4,7 @@ require("dotenv").config();
 const { printTable } = require("console-table-printer");
 
 function startProg() {
-  console.log("Welcome to Employee Tracker!")
+  console.log("Welcome to Employee Tracker!");
   inquirer
     .prompt({
       type: "list",
@@ -73,7 +73,7 @@ function rolePrompt() {
       choices: ["View All Positions", "Add New Position", "Exit"],
     })
     .then(function (answer) {
-      switch (answer.emplMenu) {
+      switch (answer.roleMenu) {
         case "View All Positions":
           allRoles();
           break;
@@ -95,7 +95,7 @@ function deptPrompt() {
       choices: ["View All Departments", "Add New Department", "Exit"],
     })
     .then(function (answer) {
-      switch (answer.emplMenu) {
+      switch (answer.deptMenu) {
         case "View All Departments":
           allDepts();
           break;
@@ -107,32 +107,47 @@ function deptPrompt() {
       }
     });
 }
-
-DB.getDepts().then((dept) => {
-  //   console.log(dept);
-});
+function allDepts() {
+  console.log("Here is a list of all departments");
+  DB.getDepts().then((dept) => {
+    printTable(dept);
+    startProg();
+    //   console.log(dept);
+  });
+}
 
 DB.addDept("social media").then((res) => {
   //   console.log(res);
 });
 
-DB.getRole().then((role) => {
-  //   console.log(role);
-});
+function allRoles() {
+  console.log("Here is a list of all positions");
+  DB.getRole().then((role) => {
+    printTable(role);
+    startProg();
+    //   console.log(role);
+  });
+}
 
 DB.addRole("Receptionist", 50000, 4).then((res) => {
   //   console.log(res);
 });
+
 function allEmployees() {
-  console.log("Here is a list of all employees")
-DB.getEmployee().then((employee) => {
-  printTable(employee);
-  startProg();
-  //   console.log(employee);
-});
+  console.log("Here is a list of all employees");
+  DB.getEmployee().then((employee) => {
+    printTable(employee);
+    startProg();
+    //   console.log(employee);
+  });
 }
+
 DB.addEmployee("Tiffany", "Smith", 2, 1).then((res) => {
   //   console.log(res);
 });
 
 startProg();
+
+function theEnd() {
+  console.log("the end");
+}
