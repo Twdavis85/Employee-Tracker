@@ -107,6 +107,7 @@ function deptPrompt() {
       }
     });
 }
+
 function allDepts() {
   console.log("Here is a list of all departments");
   DB.getDepts().then((dept) => {
@@ -142,12 +143,60 @@ function allEmployees() {
   });
 }
 
-DB.addEmployee("Tiffany", "Smith", 2, 1).then((res) => {
-  //   console.log(res);
-});
+async function newEmployee() {
+  const roles = await DB.getRole();
+  const roleList = roles.map(({ id, title }) => ({
+    name: title,
+    value: id,
+  }));
 
-startProg();
+  const man = await DB.getEmployee();
+  const manList = man.map(({ id, first_name, last_name }) => ({
+    name: first_name + " " + last_name,
+    value: id,
+  }));
+
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "firstName",
+        message: "Please enter the employee's first name",
+      },
+      {
+        type: "input",
+        name: "lastName",
+        message: "Please enter the employee's last name",
+      },
+      {
+        type: "list",
+        name: "roleId",
+        message: "Please select the employee's position",
+        choices: roleList,
+      },
+      {
+        type: "list",
+        name: "manId",
+        message: "Please enter the employee's manager",
+        choices: manList,
+      },
+    ])
+    .then((answers) => {
+      DB.addEmployee(
+        answers.firstName,
+        answers.lastName,
+        answers.roleId,
+        answers.manId
+      ).then((res) => {
+        allEmployees();
+        //   console.log(res);
+      });
+    });
+}
 
 function theEnd() {
   console.log("the end");
+  process.exit()
 }
+
+startProg();
