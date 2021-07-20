@@ -4,6 +4,7 @@ require("dotenv").config();
 const { printTable } = require("console-table-printer");
 
 function startProg() {
+  console.log("Welcome to Employee Tracker!")
   inquirer
     .prompt({
       type: "list",
@@ -122,11 +123,14 @@ DB.getRole().then((role) => {
 DB.addRole("Receptionist", 50000, 4).then((res) => {
   //   console.log(res);
 });
-
+function allEmployees() {
+  console.log("Here is a list of all employees")
 DB.getEmployee().then((employee) => {
+  printTable(employee);
+  startProg();
   //   console.log(employee);
 });
-
+}
 DB.addEmployee("Tiffany", "Smith", 2, 1).then((res) => {
   //   console.log(res);
 });
