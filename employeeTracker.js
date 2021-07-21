@@ -4,12 +4,33 @@ require("dotenv").config();
 const { printTable } = require("console-table-printer");
 
 function startProg() {
-  console.log("Welcome to Employee Tracker!");
+  console.log(`
+  ######## ##     ## ########  ##        #######  ##    ## ######## ######## 
+  ##       ###   ### ##     ## ##       ##     ##  ##  ##  ##       ##       
+  ##       #### #### ##     ## ##       ##     ##   ####   ##       ##       
+  ######   ## ### ## ########  ##       ##     ##    ##    ######   ######   
+  ##       ##     ## ##        ##       ##     ##    ##    ##       ##       
+  ##       ##     ## ##        ##       ##     ##    ##    ##       ##       
+  ######## ##     ## ##        ########  #######     ##    ######## ######## 
+  
+  ######## ########     ###     ######  ##    ## ######## ########           
+     ##    ##     ##   ## ##   ##    ## ##   ##  ##       ##     ##          
+     ##    ##     ##  ##   ##  ##       ##  ##   ##       ##     ##          
+     ##    ########  ##     ## ##       #####    ######   ########           
+     ##    ##   ##   ######### ##       ##  ##   ##       ##   ##            
+     ##    ##    ##  ##     ## ##    ## ##   ##  ##       ##    ##           
+     ##    ##     ## ##     ##  ######  ##    ## ######## ##     ##   
+     
+     `);
+     mainMenu()
+}
+
+function mainMenu() {     
   inquirer
     .prompt({
       type: "list",
       name: "menu",
-      message: "MAIN MENU?",
+      message: "MAIN MENU",
       choices: [
         "Work with Employees",
         "Work with Positions",
@@ -108,42 +129,88 @@ function deptPrompt() {
     });
 }
 
-function allDepts() {
+const allDepts = () => {
   console.log("Here is a list of all departments");
   DB.getDepts().then((dept) => {
     printTable(dept);
-    startProg();
+    mainMenu();
     //   console.log(dept);
   });
 }
 
-DB.addDept("social media").then((res) => {
-  //   console.log(res);
-});
+const newDept = () => {
+  inquirer
+  .prompt({
+    type: "input",
+    name: "newDepart",
+    message: "What is the name of the new department?",
+  })
+  .then((answer) => {
+    DB.addDept(answer.newDepart)
+    .then((res) => {
+      allDepts();
+    //   console.log(res);
+  });
+  
+  });
+}
 
-function allRoles() {
+
+const allRoles = () => {
   console.log("Here is a list of all positions");
   DB.getRole().then((role) => {
     printTable(role);
-    startProg();
+    mainMenu();
     //   console.log(role);
   });
 }
 
-DB.addRole("Receptionist", 50000, 4).then((res) => {
-  //   console.log(res);
-});
+const newRole = async () => {
 
-function allEmployees() {
+  const department = await DB.getDepts();
+  const deptList = department.map(({ id, dept_name }) => ({
+    name: dept_name,
+    value: id
+  }));
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "position",
+        message: "What is the title for this position?",
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "What is the salary for this position?",
+      },
+      {
+        type: "list",
+        name: "dept",
+        message: "What department will this position be assigned to?",
+        choices: deptList,
+      },
+    ])
+    .then((answers) => {
+  DB.addRole(answers.position, answers.salary, answers.dept)
+  .then((res) => {
+    allRoles()
+    //   console.log(res);
+  });
+});
+}
+
+
+const allEmployees = () => {
   console.log("Here is a list of all employees");
   DB.getEmployee().then((employee) => {
     printTable(employee);
-    startProg();
+    mainMenu();
     //   console.log(employee);
   });
 }
 
-async function newEmployee() {
+const newEmployee = async () => {
   const roles = await DB.getRole();
   const roleList = roles.map(({ id, title }) => ({
     name: title,
