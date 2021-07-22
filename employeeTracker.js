@@ -153,19 +153,18 @@ const newEmployee = async () => {
       });
     });
 };
+
 const updateEmployee = async () => {
   const emp = await DB.viewEmployees();
   const empList = emp.map(({ id, first_name, last_name }) => ({
     name: `${first_name} ${last_name}`,
     value: id,
   }));
-
   const roles = await DB.viewRoles();
   const roleList = roles.map(({ id, title }) => ({
     name: title,
     value: id,
   }));
-
   inquirer
     .prompt([
       {
@@ -195,7 +194,6 @@ const removeEmployee = async () => {
     name: `${first_name} ${last_name}`,
     value: id,
   }));
-
   inquirer
     .prompt([
       {
@@ -422,8 +420,6 @@ const removeDept = async () => {
       });
     });
 };
-
-
 
 function theEnd() {
   console.log("Thank you for using Employee Tracker!");
