@@ -64,6 +64,7 @@ function employeePrompt() {
       choices: [
         "View All Employees",
         "Add New Employee",
+        "Update Employee's Position",
         "View Employees by Department",
         "Exit",
       ],
@@ -76,6 +77,9 @@ function employeePrompt() {
         case "Add New Employee":
           newEmployee();
           break;
+        case "Update Employee's Position":
+          updateEmployee();
+          break; 
         case "View Employees by Department":
           emplByDept();
           break;
@@ -167,7 +171,7 @@ const allRoles = () => {
 
 const newRole = async () => {
 
-  const department = await DB.getDepts();
+  const department = await DB.viewDept();
   const deptList = department.map(({ id, dept_name }) => ({
     name: dept_name,
     value: id
@@ -211,18 +215,18 @@ const allEmployees = () => {
 }
 
 const newEmployee = async () => {
-  const roles = await DB.getRole();
+  const roles = await DB.viewRoles();
   const roleList = roles.map(({ id, title }) => ({
     name: title,
     value: id,
   }));
 
-  const man = await DB.getEmployee();
+  const man = await DB.viewEmployees();
   const manList = man.map(({ id, first_name, last_name }) => ({
-    name: first_name + " " + last_name,
+    name: `${first_name} ${last_name}`,
     value: id,
   }));
-
+  manList.unshift({name: "None", value: null});
   inquirer
     .prompt([
       {
@@ -259,6 +263,46 @@ const newEmployee = async () => {
         //   console.log(res);
       });
     });
+}
+const updateEmployee = async () => {
+  const emp = await DB.viewEmployees();
+  const empList = emp.map(({ id, first_name, last_name }) => ({
+    name: `${first_name} ${last_name}`,
+    value: id,
+  }));
+
+  const roles = await DB.viewRoles();
+  const roleList = roles.map(({ id, title }) => ({
+    name: title,
+    value: id,
+  }));
+
+  inquirer
+  .prompt([
+    {
+      type: "list",
+      name: "updateEmp",
+      message: "Select the Employee you would like to update",
+      choices: empList
+    },
+    {
+      type: "list",
+      name: "newRole",
+      message: "Select the Employee's new Position",
+      choices: roleList
+    },
+  ])
+  .then((answers) => {
+    DB.updateEmployeeRole(
+      answers.newRole,
+      answers.updateEmp,
+    ).then((res) => {
+      allEmployees();
+      //   console.log(res);
+    });
+  });
+
+
 }
 
 function theEnd() {
