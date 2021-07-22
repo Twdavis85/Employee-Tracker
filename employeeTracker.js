@@ -22,10 +22,10 @@ function startProg() {
      ##    ##     ## ##     ##  ######  ##    ## ######## ##     ##   
      
      `);
-     mainMenu()
+  mainMenu();
 }
 
-function mainMenu() {     
+function mainMenu() {
   inquirer
     .prompt({
       type: "list",
@@ -66,6 +66,7 @@ function employeePrompt() {
         "Add New Employee",
         "Update Employee's Position",
         "View Employees by Department",
+        "Remove Employee",
         "Exit",
       ],
     })
@@ -79,131 +80,19 @@ function employeePrompt() {
           break;
         case "Update Employee's Position":
           updateEmployee();
-          break; 
+          break;
         case "View Employees by Department":
           emplByDept();
           break;
+        case "Remove Employee":
+          removeEmployee();
+          break;
+
         default:
           theEnd();
       }
     });
 }
-
-function rolePrompt() {
-  inquirer
-    .prompt({
-      type: "list",
-      name: "roleMenu",
-      message: "What would you like to do?",
-      choices: ["View All Positions", "Add New Position", "Exit"],
-    })
-    .then(function (answer) {
-      switch (answer.roleMenu) {
-        case "View All Positions":
-          allRoles();
-          break;
-        case "Add New Position":
-          newRole();
-          break;
-        default:
-          theEnd();
-      }
-    });
-}
-
-function deptPrompt() {
-  inquirer
-    .prompt({
-      type: "list",
-      name: "deptMenu",
-      message: "What would you like to do?",
-      choices: ["View All Departments", "Add New Department", "Exit"],
-    })
-    .then(function (answer) {
-      switch (answer.deptMenu) {
-        case "View All Departments":
-          allDepts();
-          break;
-        case "Add New Department":
-          newDept();
-          break;
-        default:
-          theEnd();
-      }
-    });
-}
-
-const allDepts = () => {
-  console.log("Here is a list of all departments");
-  DB.getDepts().then((dept) => {
-    printTable(dept);
-    mainMenu();
-    //   console.log(dept);
-  });
-}
-
-const newDept = () => {
-  inquirer
-  .prompt({
-    type: "input",
-    name: "newDepart",
-    message: "What is the name of the new department?",
-  })
-  .then((answer) => {
-    DB.addDept(answer.newDepart)
-    .then((res) => {
-      allDepts();
-    //   console.log(res);
-  });
-  
-  });
-}
-
-
-const allRoles = () => {
-  console.log("Here is a list of all positions");
-  DB.getRole().then((role) => {
-    printTable(role);
-    mainMenu();
-    //   console.log(role);
-  });
-}
-
-const newRole = async () => {
-
-  const department = await DB.viewDept();
-  const deptList = department.map(({ id, dept_name }) => ({
-    name: dept_name,
-    value: id
-  }));
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        name: "position",
-        message: "What is the title for this position?",
-      },
-      {
-        type: "input",
-        name: "salary",
-        message: "What is the salary for this position?",
-      },
-      {
-        type: "list",
-        name: "dept",
-        message: "What department will this position be assigned to?",
-        choices: deptList,
-      },
-    ])
-    .then((answers) => {
-  DB.addRole(answers.position, answers.salary, answers.dept)
-  .then((res) => {
-    allRoles()
-    //   console.log(res);
-  });
-});
-}
-
 
 const allEmployees = () => {
   console.log("Here is a list of all employees");
@@ -212,7 +101,7 @@ const allEmployees = () => {
     mainMenu();
     //   console.log(employee);
   });
-}
+};
 
 const newEmployee = async () => {
   const roles = await DB.viewRoles();
@@ -226,7 +115,7 @@ const newEmployee = async () => {
     name: `${first_name} ${last_name}`,
     value: id,
   }));
-  manList.unshift({name: "None", value: null});
+  manList.unshift({ name: "None", value: null });
   inquirer
     .prompt([
       {
@@ -263,7 +152,7 @@ const newEmployee = async () => {
         //   console.log(res);
       });
     });
-}
+};
 const updateEmployee = async () => {
   const emp = await DB.viewEmployees();
   const empList = emp.map(({ id, first_name, last_name }) => ({
@@ -278,36 +167,267 @@ const updateEmployee = async () => {
   }));
 
   inquirer
-  .prompt([
-    {
-      type: "list",
-      name: "updateEmp",
-      message: "Select the Employee you would like to update",
-      choices: empList
-    },
-    {
-      type: "list",
-      name: "newRole",
-      message: "Select the Employee's new Position",
-      choices: roleList
-    },
-  ])
-  .then((answers) => {
-    DB.updateEmployeeRole(
-      answers.newRole,
-      answers.updateEmp,
-    ).then((res) => {
-      allEmployees();
-      //   console.log(res);
+    .prompt([
+      {
+        type: "list",
+        name: "updateEmp",
+        message: "Select the Employee you would like to update",
+        choices: empList,
+      },
+      {
+        type: "list",
+        name: "newRole",
+        message: "Select the Employee's new Position",
+        choices: roleList,
+      },
+    ])
+    .then((answers) => {
+      DB.updateEmployeeRole(answers.newRole, answers.updateEmp).then((res) => {
+        allEmployees();
+        //   console.log(res);
+      });
     });
-  });
+};
 
+const removeEmployee = async () => {
+  const emp = await DB.viewEmployees();
+  const empList = emp.map(({ id, first_name, last_name }) => ({
+    name: `${first_name} ${last_name}`,
+    value: id,
+  }));
 
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "removeEmp",
+        message: "Select the Employee you would like to remove",
+        choices: empList,
+      },
+    ])
+    .then((answers) => {
+      DB.deleteEmployee(answers.removeEmp).then((res) => {
+        allEmployees();
+        //   console.log(res);
+      });
+    });
+};
+
+function rolePrompt() {
+  inquirer
+    .prompt({
+      type: "list",
+      name: "roleMenu",
+      message: "What would you like to do?",
+      choices: [
+        "View All Positions",
+        "Add New Position",
+        "Remove Position",
+        "Exit",
+      ],
+    })
+    .then(function (answer) {
+      switch (answer.roleMenu) {
+        case "View All Positions":
+          allRoles();
+          break;
+        case "Add New Position":
+          newRole();
+          break;
+        case "Remove Position":
+          verifyRemove();
+          break;
+        default:
+          theEnd();
+      }
+    });
 }
 
+const allRoles = () => {
+  console.log("Here is a list of all positions");
+  DB.getRole().then((role) => {
+    printTable(role);
+    mainMenu();
+    //   console.log(role);
+  });
+};
+
+const newRole = async () => {
+  const department = await DB.viewDepts();
+  const deptList = department.map(({ id, dept_name }) => ({
+    name: dept_name,
+    value: id,
+  }));
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "position",
+        message: "What is the title for this position?",
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "What is the salary for this position?",
+      },
+      {
+        type: "list",
+        name: "dept",
+        message: "What department will this position be assigned to?",
+        choices: deptList,
+      },
+    ])
+    .then((answers) => {
+      DB.addRole(answers.position, answers.salary, answers.dept).then((res) => {
+        allRoles();
+        //   console.log(res);
+      });
+    });
+};
+
+const verifyRemove = () => {
+  inquirer
+    .prompt({
+      type: "list",
+      name: "roleVerify",
+      message:
+        "Removing a position will also delete all Employees assigned to it.  Would you like to continue?",
+      choices: ["Yes", "No"],
+    })
+    .then(function (answer) {
+      switch (answer.roleVerify) {
+        case "Yes":
+          removeRole();
+          break;
+        default:
+          mainMenu();
+      }
+    });
+};
+
+const removeRole = async () => {
+  const roles = await DB.viewRoles();
+  const roleList = roles.map(({ id, title }) => ({
+    name: title,
+    value: id,
+  }));
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "delRole",
+        message: "What Position would you like to remove?",
+        choices: roleList,
+      },
+    ])
+    .then((answers) => {
+      DB.deleteRole(answers.delRole).then((res) => {
+        allRoles();
+      });
+    });
+};
+
+function deptPrompt() {
+  inquirer
+    .prompt({
+      type: "list",
+      name: "deptMenu",
+      message: "What would you like to do?",
+      choices: [
+        "View All Departments",
+        "Add New Department",
+        "Remove Department",
+        "Exit",
+      ],
+    })
+    .then(function (answer) {
+      switch (answer.deptMenu) {
+        case "View All Departments":
+          allDepts();
+          break;
+        case "Add New Department":
+          newDept();
+          break;
+        case "Remove Department":
+          verifyDeptRemove();
+          break;
+        default:
+          theEnd();
+      }
+    });
+}
+
+const allDepts = () => {
+  console.log("Here is a list of all departments");
+  DB.getDepts().then((dept) => {
+    printTable(dept);
+    mainMenu();
+    //   console.log(dept);
+  });
+};
+
+const newDept = () => {
+  inquirer
+    .prompt({
+      type: "input",
+      name: "newDept",
+      message: "What is the name of the new department?",
+    })
+    .then((answer) => {
+      DB.addDept(answer.newDept).then((res) => {
+        allDepts();
+        //   console.log(res);
+      });
+    });
+};
+
+const verifyDeptRemove = () => {
+  inquirer
+    .prompt({
+      type: "list",
+      name: "deptVerify",
+      message:
+        "Removing a Department will also delete all Employees and Positions assigned to it.  Would you like to continue?",
+      choices: ["Yes", "No"],
+    })
+    .then(function (answer) {
+      switch (answer.deptVerify) {
+        case "Yes":
+          removeDept();
+          break;
+        default:
+          mainMenu();
+      }
+    });
+};
+
+const removeDept = async () => {
+  const department = await DB.viewDepts();
+  const deptList = department.map(({ id, dept_name }) => ({
+    name: dept_name,
+    value: id,
+  }));
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "delDept",
+        message: "What Department would you like to remove?",
+        choices: deptList,
+      },
+    ])
+    .then((answers) => {
+      DB.deleteDept(answers.delDept).then((res) => {
+        allDepts();
+      });
+    });
+};
+
+
+
 function theEnd() {
-  console.log("the end");
-  process.exit()
+  console.log("Thank you for using Employee Tracker!");
+  process.exit();
 }
 
 startProg();

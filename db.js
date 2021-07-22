@@ -4,7 +4,7 @@ class DB {
   constructor(connection) {
     this.connection = connection;
   }
-  viewDept() {
+  viewDepts() {
     return this.connection.query("SELECT * FROM departments;"); 
   }
   getDepts() {
@@ -15,6 +15,12 @@ class DB {
       dept_name: name,
     });
   }
+  deleteDept(delDept) {
+    return this.connection.query("DELETE FROM departments WHERE id = ?", [
+      delDept
+    ])
+  }
+
   viewRoles() {
     return this.connection.query("SELECT * FROM roles;"); 
   }
@@ -27,6 +33,11 @@ class DB {
       salary: salary,
       dept_id: deptId,
     });
+  }
+  deleteRole(delRole) {
+    return this.connection.query("DELETE FROM roles WHERE id = ?", [
+      delRole
+    ])
   }
   viewEmployees() {
     return this.connection.query("SELECT * FROM employee;");
@@ -41,6 +52,11 @@ class DB {
          role_id: roleId,
          man_id: manId, 
       });
+  }
+  deleteEmployee(delEmployee) {
+    return this.connection.query("DELETE FROM employee WHERE id = ?", [
+      delEmployee
+    ])
   }
   updateEmployeeRole(newRole, updateEmp) {
     return this.connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [
