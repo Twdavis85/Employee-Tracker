@@ -64,7 +64,8 @@ function employeePrompt() {
       choices: [
         "View All Employees",
         "Add New Employee",
-        "Update Employee's Position",
+        "Update Employee Position",
+        "Update Employee Manager",
         "View Employees by Department",
         "Remove Employee",
         "Exit",
@@ -78,8 +79,11 @@ function employeePrompt() {
         case "Add New Employee":
           newEmployee();
           break;
-        case "Update Employee's Position":
+        case "Update Employee Position":
           updateEmployee();
+          break;
+        case "Update Employee Manager":
+          updateManager();
           break;
         case "View Employees by Department":
           emplByDept();
@@ -89,7 +93,7 @@ function employeePrompt() {
           break;
 
         default:
-          theEnd();
+          mainMenu();
       }
     });
 }
@@ -154,6 +158,41 @@ const newEmployee = async () => {
     });
 };
 
+const updateManager = async () => {
+  const emp = await DB.viewEmployees();
+  const empList = emp.map(({ id, first_name, last_name }) => ({
+    name: `${first_name} ${last_name}`,
+    value: id,
+  }));
+  const man = await DB.viewEmployees();
+  const manList = man.map(({ id, first_name, last_name }) => ({
+    name: `${first_name} ${last_name}`,
+    value: id,
+  }));
+  manList.unshift({ name: "None", value: null });
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "emplId",
+        message: "Select the Employee you would like to update",
+        choices: empList,
+      },
+      {
+        type: "list",
+        name: "newMan",
+        message: "Select the Employee's new Manager",
+        choices: manList,
+      },
+    ])
+    .then((answers) => {
+      DB.updateEmployeeManager(answers.newMan, answers.emplId).then((res) => {
+        allEmployees();
+        //   console.log(res);
+      });
+    });
+};
+
 const updateEmployee = async () => {
   const emp = await DB.viewEmployees();
   const empList = emp.map(({ id, first_name, last_name }) => ({
@@ -188,6 +227,31 @@ const updateEmployee = async () => {
     });
 };
 
+
+const emplByDept = async () => {
+  const department = await DB.viewDepts();
+  const deptList = department.map(({ id, dept_name }) => ({
+    name: dept_name,
+    value: id,
+  }));
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "deptId",
+        message: "Select the Department you would like to view",
+        choices: deptList,
+      },
+    ])
+    .then((answer) => {
+      DB.viewEmployeesByDept(answer.deptId).then((department) => {
+        printTable(department);
+        mainMenu();
+        //   console.log(res);
+      });
+    });
+};
+
 const removeEmployee = async () => {
   const emp = await DB.viewEmployees();
   const empList = emp.map(({ id, first_name, last_name }) => ({
@@ -203,8 +267,8 @@ const removeEmployee = async () => {
         choices: empList,
       },
     ])
-    .then((answers) => {
-      DB.deleteEmployee(answers.removeEmp).then((res) => {
+    .then((answer) => {
+      DB.deleteEmployee(answer.removeEmp).then((res) => {
         allEmployees();
         //   console.log(res);
       });
@@ -236,7 +300,7 @@ function rolePrompt() {
           verifyRemove();
           break;
         default:
-          theEnd();
+          mainMenu();
       }
     });
 }
@@ -318,8 +382,8 @@ const removeRole = async () => {
         choices: roleList,
       },
     ])
-    .then((answers) => {
-      DB.deleteRole(answers.delRole).then((res) => {
+    .then((answer) => {
+      DB.deleteRole(answer.delRole).then((res) => {
         allRoles();
       });
     });
@@ -350,7 +414,7 @@ function deptPrompt() {
           verifyDeptRemove();
           break;
         default:
-          theEnd();
+          mainMenu();
       }
     });
 }
@@ -414,15 +478,15 @@ const removeDept = async () => {
         choices: deptList,
       },
     ])
-    .then((answers) => {
-      DB.deleteDept(answers.delDept).then((res) => {
+    .then((answer) => {
+      DB.deleteDept(answer.delDept).then((res) => {
         allDepts();
       });
     });
 };
 
 function theEnd() {
-  console.log("Thank you for using Employee Tracker!");
+  console.log("Good Bye, Thank you for using Employee Tracker!");
   process.exit();
 }
 

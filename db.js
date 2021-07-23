@@ -67,6 +67,18 @@ class DB {
       [newRole, updateEmp]
     );
   }
+  updateEmployeeManager(newMan, emplId) {
+    return this.connection.query(
+      "UPDATE employee SET man_id = ? WHERE id = ?",
+      [newMan, emplId]
+    );
+  }
+  viewEmployeesByDept(deptId) {
+    return this.connection.query(
+      "SELECT departments.id AS 'ID', departments.dept_name AS 'Department', roles.title AS 'Title', employee.first_name AS 'First Name', employee.last_name AS 'Last Name' FROM employee LEFT JOIN roles on employee.role_id = roles.id LEFT JOIN departments on roles.dept_id = departments.id WHERE departments.id = ?",
+      [deptId]
+    );
+  }
 }
 
 module.exports = new DB(connection);
