@@ -103,7 +103,6 @@ const allEmployees = () => {
   DB.getEmployee().then((employee) => {
     printTable(employee);
     mainMenu();
-    //   console.log(employee);
   });
 };
 
@@ -153,7 +152,6 @@ const newEmployee = async () => {
         answers.manId
       ).then((res) => {
         allEmployees();
-        //   console.log(res);
       });
     });
 };
@@ -188,7 +186,6 @@ const updateManager = async () => {
     .then((answers) => {
       DB.updateEmployeeManager(answers.newMan, answers.emplId).then((res) => {
         allEmployees();
-        //   console.log(res);
       });
     });
 };
@@ -222,11 +219,9 @@ const updateEmployee = async () => {
     .then((answers) => {
       DB.updateEmployeeRole(answers.newRole, answers.updateEmp).then((res) => {
         allEmployees();
-        //   console.log(res);
       });
     });
 };
-
 
 const emplByDept = async () => {
   const department = await DB.viewDepts();
@@ -247,7 +242,6 @@ const emplByDept = async () => {
       DB.viewEmployeesByDept(answer.deptId).then((department) => {
         printTable(department);
         mainMenu();
-        //   console.log(res);
       });
     });
 };
@@ -270,7 +264,6 @@ const removeEmployee = async () => {
     .then((answer) => {
       DB.deleteEmployee(answer.removeEmp).then((res) => {
         allEmployees();
-        //   console.log(res);
       });
     });
 };
@@ -310,7 +303,6 @@ const allRoles = () => {
   DB.getRole().then((role) => {
     printTable(role);
     mainMenu();
-    //   console.log(role);
   });
 };
 
@@ -342,7 +334,6 @@ const newRole = async () => {
     .then((answers) => {
       DB.addRole(answers.position, answers.salary, answers.dept).then((res) => {
         allRoles();
-        //   console.log(res);
       });
     });
 };
@@ -424,7 +415,6 @@ const allDepts = () => {
   DB.getDepts().then((dept) => {
     printTable(dept);
     mainMenu();
-    //   console.log(dept);
   });
 };
 
@@ -438,7 +428,6 @@ const newDept = () => {
     .then((answer) => {
       DB.addDept(answer.newDept).then((res) => {
         allDepts();
-        //   console.log(res);
       });
     });
 };
